@@ -21,19 +21,22 @@ class UsersController < ApplicationController
     klass, field, id = params[:id].split('__')
     select_data = params[:select_array]
     object = klass.camelize.constantize.find(id)
-    if klass == 'user'
-      if object.sn_update_attribute(field, params[:value])
-        if select_data.nil?
-          render :text => CGI::escapeHTML(object.send(field).to_s)
-        else
-          parsed_data = JSON.parse(select_data.gsub("'", '"'))
-          render :text => parsed_data[object.send(field).to_s]
-        end
+    local_user_fields = ["bio"]
+    if klass == 'user' and not local_user_fields.include?(field)
+      updated = object.sn_update_attribute(field, params[:value])
+    else
+      updated = object.update_attribute(field, params[:value])
+    end
+
+    if updated
+      if select_data.nil?
+        render :text => CGI::escapeHTML(object.send(field).to_s)
       else
-        render :text => object.errors.full_messages.join("\n"), :status => 422
+        parsed_data = JSON.parse(select_data.gsub("'", '"'))
+        render :text => parsed_data[object.send(field).to_s]
       end
     else
-      super
+      render :text => object.errors.full_messages.join("\n"), :status => 422
     end
   end
 
