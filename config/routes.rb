@@ -18,7 +18,7 @@ Catarse::Application.routes.draw do
   match "/explore/:quick" => "projects#explore", :as => :explore_quick
   match "/credits" => "credits#index", :as => :credits
 
-  post "/pre_auth" => "sessions#pre_auth", :as => :pre_auth
+  match "/pre_auth" => "sessions#pre_auth", :as => :pre_auth
   get "/auth" => "sessions#auth", :as => :auth
   get "/post_auth" => "sessions#post_auth", :as => :post_auth
   match "/auth/:provider/callback" => "sessions#create"
