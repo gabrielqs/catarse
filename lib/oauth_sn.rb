@@ -1,7 +1,6 @@
 require 'omniauth/oauth'
 require 'multi_json'
-CUSTOM_PROVIDER_URL = 'http://oauthsn-dev.heroku.com/'
-# CUSTOM_PROVIDER_URL = 'http://localhost:3000/'
+CUSTOM_PROVIDER_URL = (Rails.env == 'production' ? 'http://oauthsn-dev.heroku.com/' : 'http://localhost:3009/')
 module OmniAuth
  module Strategies
 
