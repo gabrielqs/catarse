@@ -2,7 +2,7 @@
 class SessionsController < ApplicationController
 
   skip_before_filter :detect_locale
-  
+
   def pre_auth
     session[:return_to] = params[:return_to]
     session[:remember_me] = params[:remember_me]
@@ -22,6 +22,7 @@ class SessionsController < ApplicationController
       new_user = true
     end
     user.update_attribute :session_id, session[:return_session_id]
+    user.update_attribute :sn_token, auth['credentials']['token']
     redirect_url = "/post_auth/?user_id=#{user.id}&new_user=#{new_user}"
     if session[:return_site_id] and session[:return_site_id].to_s != current_site.id.to_s
       site = Site.find(session[:return_site_id])
