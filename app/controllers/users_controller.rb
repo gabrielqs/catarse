@@ -1,4 +1,4 @@
-# coding: utf-8
+#encoding: utf-8
 class UsersController < ApplicationController
   inherit_resources
   actions :show
@@ -16,6 +16,27 @@ class UsersController < ApplicationController
       @projects = @projects.all
     }
   end
+
+  def update_attribute_on_the_spot
+    klass, field, id = params[:id].split('__')
+    select_data = params[:select_array]
+    object = klass.camelize.constantize.find(id)
+    if klass == 'user'
+      if object.sn_update_attribute(field, params[:value])
+        if select_data.nil?
+          render :text => CGI::escapeHTML(object.send(field).to_s)
+        else
+          parsed_data = JSON.parse(select_data.gsub("'", '"'))
+          render :text => parsed_data[object.send(field).to_s]
+        end
+      else
+        render :text => object.errors.full_messages.join("\n"), :status => 422
+      end
+    else
+      super
+    end
+  end
+
   private
   def can_update_on_the_spot?
     user_fields = ["email", "name", "bio", "newsletter", "project_updates"]
