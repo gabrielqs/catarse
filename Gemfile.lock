@@ -343,6 +343,7 @@ DEPENDENCIES
   rails (= 3.0.3)
   rake (= 0.8.7)
   rcov
+  rest-client
   rmagick
   routing-filter
   rspec-rails (~> 2.0.1)
