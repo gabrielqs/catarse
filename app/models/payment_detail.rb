@@ -72,6 +72,7 @@ class PaymentDetail < ActiveRecord::Base
 
 end
 
+
 # == Schema Information
 #
 # Table name: payment_details
@@ -86,6 +87,7 @@ end
 #  net_amount             :decimal(, )
 #  total_amount           :decimal(, )
 #  service_tax_amount     :decimal(, )
+#  backer_amount_tax      :decimal(, )
 #  payment_status         :string(255)
 #  service_code           :string(255)
 #  institution_of_payment :string(255)

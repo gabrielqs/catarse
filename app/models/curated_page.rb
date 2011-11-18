@@ -52,6 +52,7 @@ class CuratedPage < ActiveRecord::Base
 
 end
 
+
 # == Schema Information
 #
 # Table name: curated_pages
@@ -66,5 +67,6 @@ end
 #  updated_at   :datetime
 #  permalink    :string(255)
 #  site_id      :integer
+#  visible      :boolean         default(FALSE)
 #
 
