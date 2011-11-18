@@ -15,8 +15,10 @@
               %li= link_to t('.menu.explore'), explore_path
               %li= link_to t('.menu.submit'), guidelines_path, :id => 'new_project_link'
               - unless current_user
-                %li= link_to t('.menu.signup'), '#', :id => 'signup_link'
-                %li= link_to t('.menu.login'), '#', :id => 'login_link'
+                / %li= link_to t('.menu.signup'), '#', :id => 'signup_link'
+                / %li= link_to t('.menu.login'), '#', :id => 'login_link'
+                %li= link_to t('.menu.signup'), '/pre_auth?provider=oauth_sn'
+                %li= link_to t('.menu.login'), '/pre_auth?provider=oauth_sn'
           .clear
       #content_wrapper
         #content_header_wrapper
