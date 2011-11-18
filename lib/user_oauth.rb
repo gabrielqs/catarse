@@ -5,18 +5,20 @@ module UserOauth
   module InstanceMethods
     def oauth_sn
       @oauth_sn ||= ActiveSupport::JSON.decode(RestClient.get(CUSTOM_PROVIDER_URL+"users/#{_user.uid}.json"))
+    rescue
+      []
     end
 
     def sn_name
-      oauth_sn["name"]
+      oauth_sn["name"] rescue nil
     end
 
     def sn_email
-      oauth_sn["email"]
+      oauth_sn["email"] rescue nil
     end
 
     def sn_nickname
-      oauth_sn["nickname"]
+      oauth_sn["nickname"] rescue nil
     end
 
     def sn_update_attribute(field, value)
