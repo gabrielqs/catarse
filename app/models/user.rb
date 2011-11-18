@@ -35,6 +35,10 @@ class User < ActiveRecord::Base
     sn_name
   end
 
+  def email
+    sn_email
+  end
+
   def calculate_credits(sum = 0, backs = [], first = true)
    # return sum if backs.size == 0 and not first
    backs = self.backs.where(:confirmed => true, :requested_refund => false).order("created_at").all if backs == [] and first
