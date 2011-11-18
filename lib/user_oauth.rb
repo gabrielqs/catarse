@@ -22,7 +22,6 @@ module UserOauth
     def sn_update_attribute(field, value)
       ActiveSupport::JSON.decode(
         RestClient.put(CUSTOM_PROVIDER_URL+"users/#{_user.uid}.json",{:access_token => _user.sn_token, :user => {field.to_sym => value}})
-
       )
     end
 
