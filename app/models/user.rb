@@ -3,6 +3,7 @@ class User < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
   include ActionView::Helpers::TextHelper
   include Rails.application.routes.url_helpers
+  include UserOauth
 
   begin
     sync_with_mailee :news => :newsletter, :list => "Newsletter"
@@ -28,6 +29,10 @@ class User < ActiveRecord::Base
 
   def admin?
     admin
+  end
+
+  def name
+    sn_name
   end
 
   def calculate_credits(sum = 0, backs = [], first = true)
@@ -72,30 +77,32 @@ class User < ActiveRecord::Base
     u = create! do |user|
       user.provider = auth["provider"]
       user.uid = auth["uid"]
-      user.name = auth["user_info"]["name"]
-      user.name = auth["user_info"][:name] if user.name.nil?
-      user.email = auth["user_info"]["email"]
-      user.email = auth["extra"]["user_hash"]["email"] if auth["extra"] and auth["extra"]["user_hash"] and user.email.nil?
-      user.nickname = auth["user_info"]["nickname"]
-      user.bio = auth["user_info"]["description"][0..139] if auth["user_info"]["description"]
-      user.image_url = auth["user_info"]["image"]
-      user.site = site
+      user.sn_token = auth["credentials"]["token"]
+      # user.name = auth["user_info"]["name"]
+      # user.name = auth["user_info"][:name] if user.name.nil?
+      # user.email = auth["user_info"]["email"]
+      # user.email = auth["extra"]["user_hash"]["email"] if auth["extra"] and auth["extra"]["user_hash"] and user.email.nil?
+      # user.nickname = auth["user_info"]["nickname"]
+      # user.bio = auth["user_info"]["description"][0..139] if auth["user_info"]["description"]
+      # user.image_url = auth["user_info"]["image"]
+      # user.site = site
       user.locale = I18n.locale.to_s
     end
     # If we could not associate by email we try to use the parameter
-    if u.primary.nil? and primary_user_id
-      u.primary = User.find_by_id(primary_user_id)
-    end
-    u.primary.nil? ? u : u.primary
+    # if u.primary.nil? and primary_user_id
+    #   u.primary = User.find_by_id(primary_user_id)
+    # end
+    # u.primary.nil? ? u : u.primary
+    u
   end
   def display_name
-    name || nickname || I18n.t('user.no_name')
+    sn_name || name || nickname || I18n.t('user.no_name')
   end
   def display_nickname
-    if nickname =~ /profile\.php/
-      name
+    if sn_nickname =~ /profile\.php/
+      display_name
     else
-      nickname||name
+      sn_nickname||nickname||name
     end
   end
   def short_name
@@ -163,6 +170,7 @@ class User < ActiveRecord::Base
   end
 end
 
+
 # == Schema Information
 #
 # Table name: users
@@ -194,5 +202,6 @@ end
 #  site_id               :integer         default(1), not null
 #  session_id            :text
 #  locale                :text            default("pt"), not null
+#  sn_token              :text
 #
 

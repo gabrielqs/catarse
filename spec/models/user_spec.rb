@@ -80,11 +80,11 @@ describe User do
     u.bio = "a".center(141)
     u.should_not be_valid
   end
-  it "should create and associate user passed as parameter if passed" do
-    primary = Factory(:user)
+
+  it 'should create with oauth params' do
     auth = {
-      'provider' => "twitter",
-      'uid' => "foobar",
+      'provider' => "oauth_sn",
+      'uid' => "123456",
       'user_info' => {
         'name' => "Foo bar",
         'email' => 'another_email@catarse.me',
@@ -93,10 +93,28 @@ describe User do
         'image' => "user.png"
       }
     }
-    u = User.create_with_omniauth(Factory(:site), auth, primary.id)
-    u.should == primary
-    User.count.should == 2
+    u = User.create_with_omniauth(auth)
+    u.provider.should == 'oauth_sn'
+    u.uid.should = '123456'
+    User.count.should == 1
   end
+  # it "should create and associate user passed as parameter if passed" do
+  #   primary = Factory(:user)
+  #   auth = {
+  #     'provider' => "twitter",
+  #     'uid' => "foobar",
+  #     'user_info' => {
+  #       'name' => "Foo bar",
+  #       'email' => 'another_email@catarse.me',
+  #       'nickname' => "foobar",
+  #       'description' => "Foo bar's bio".ljust(200),
+  #       'image' => "user.png"
+  #     }
+  #   }
+  #   u = User.create_with_omniauth(Factory(:site), auth, primary.id)
+  #   u.should == primary
+  #   User.count.should == 2
+  # end
   it "should have a find_with_omniauth who finds always the primary" do
     primary = Factory(:user)
     secondary = Factory(:user, :primary_user_id => primary.id)
@@ -105,26 +123,26 @@ describe User do
     # If user does not exist just returns nil
     User.find_with_omni_auth(secondary.provider, 'user that does not exist').should == nil
   end
-  it "should create a new user receiving a omniauth hash" do
-    auth = {
-      'provider' => "twitter",
-      'uid' => "foobar",
-      'user_info' => {
-        'name' => "Foo bar",
-        'nickname' => "foobar",
-        'description' => "Foo bar's bio".ljust(200),
-        'image' => "user.png"
-      }
-    }
-    u = User.create_with_omniauth(Factory(:site), auth)
-    u.should be_valid
-    u.provider.should == auth['provider']
-    u.uid.should == auth['uid']
-    u.name.should == auth['user_info']['name']
-    u.nickname.should == auth['user_info']['nickname']
-    u.bio.should == auth['user_info']['description'][0..139]
-    u.image_url.should == auth['user_info']['image']
-  end
+  # it "should create a new user receiving a omniauth hash" do
+  #   auth = {
+  #     'provider' => "twitter",
+  #     'uid' => "foobar",
+  #     'user_info' => {
+  #       'name' => "Foo bar",
+  #       'nickname' => "foobar",
+  #       'description' => "Foo bar's bio".ljust(200),
+  #       'image' => "user.png"
+  #     }
+  #   }
+  #   u = User.create_with_omniauth(Factory(:site), auth)
+  #   u.should be_valid
+  #   u.provider.should == auth['provider']
+  #   u.uid.should == auth['uid']
+  #   u.name.should == auth['user_info']['name']
+  #   u.nickname.should == auth['user_info']['nickname']
+  #   u.bio.should == auth['user_info']['description'][0..139]
+  #   u.image_url.should == auth['user_info']['image']
+  # end
   it "should have a display_name that shows the name, nickname or 'Sem nome'" do
     u = Factory(:user, :name => "Name")
     u.display_name.should == "Name"
@@ -190,6 +208,7 @@ describe User do
 end
 
 
+
 # == Schema Information
 #
 # Table name: users
@@ -221,5 +240,6 @@ end
 #  site_id               :integer         default(1), not null
 #  session_id            :text
 #  locale                :text            default("pt"), not null
+#  sn_token              :text
 #
 
