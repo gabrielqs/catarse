@@ -10,7 +10,7 @@ describe FakeUser do
       @user = create(:user, :uid => '1234')
       user_json =  '{"email":"forevertonny@gmail.com","id":5,"name":"Lorem Ipsum Dolor","nickname":"Dolor"}'
       subject.stubs(:_user).returns(@user)
-      RestClient.stubs(:get).with(CUSTOM_PROVIDER_URL+"/users/1234").returns(user_json)
+      RestClient.stubs(:get).returns(user_json)
     end
 
     its(:sn_name) { should == "Lorem Ipsum Dolor" }
