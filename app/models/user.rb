@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
     Rails.logger.error "Error when syncing with mailee: #{e.inspect}"
   end
 
-  validates_presence_of :provider, :uid, :site
+  validates_presence_of :provider, :uid
   validates_uniqueness_of :uid, :scope => :provider
   validates_length_of :bio, :maximum => 140
   validates :email, :email => true, :allow_nil => true, :allow_blank => true
@@ -21,7 +21,6 @@ class User < ActiveRecord::Base
   has_many :comments
   has_many :secondary_users, :class_name => 'User', :foreign_key => :primary_user_id
   has_and_belongs_to_many :manages_projects, :join_table => "projects_managers", :class_name => 'Project'
-  belongs_to :site
   belongs_to :primary, :class_name => 'User', :foreign_key => :primary_user_id
   scope :primary, :conditions => ["primary_user_id IS NULL"]
   scope :backers, :conditions => ["id IN (SELECT DISTINCT user_id FROM backers WHERE confirmed)"]
@@ -77,19 +76,11 @@ class User < ActiveRecord::Base
     u.primary.nil? ? u : u.primary
   end
 
-  def self.create_with_omniauth(site, auth, primary_user_id = nil)
+  def self.create_with_omniauth(auth, primary_user_id = nil)
     u = create! do |user|
       user.provider = auth["provider"]
       user.uid = auth["uid"]
       user.sn_token = auth["credentials"]["token"]
-      # user.name = auth["user_info"]["name"]
-      # user.name = auth["user_info"][:name] if user.name.nil?
-      # user.email = auth["user_info"]["email"]
-      # user.email = auth["extra"]["user_hash"]["email"] if auth["extra"] and auth["extra"]["user_hash"] and user.email.nil?
-      # user.nickname = auth["user_info"]["nickname"]
-      # user.bio = auth["user_info"]["description"][0..139] if auth["user_info"]["description"]
-      # user.image_url = auth["user_info"]["image"]
-      # user.site = site
       user.locale = I18n.locale.to_s
     end
     # If we could not associate by email we try to use the parameter
@@ -183,42 +174,6 @@ class User < ActiveRecord::Base
   # Returns a Gravatar URL associated with the email parameter
   def gravatar_url
     return unless email
-    "http://gravatar.com/avatar/#{Digest::MD5.new.update(email)}.jpg?default=#{image_url or "http://catarse.me/images/user.png"}"
+    "http://gravatar.com/avatar/#{Digest::MD5.new.update(email)}.jpg?default=#{image_url or "#{I18n.t('site.base_url')}/images/user.png"}"
   end
 end
-
-
-# == Schema Information
-#
-# Table name: users
-#
-#  id                    :integer         not null, primary key
-#  primary_user_id       :integer
-#  provider              :text            not null
-#  uid                   :text            not null
-#  email                 :text
-#  name                  :text
-#  nickname              :text
-#  bio                   :text
-#  image_url             :text
-#  newsletter            :boolean         default(FALSE)
-#  project_updates       :boolean         default(FALSE)
-#  created_at            :datetime
-#  updated_at            :datetime
-#  admin                 :boolean         default(FALSE)
-#  full_name             :text
-#  address_street        :text
-#  address_number        :text
-#  address_complement    :text
-#  address_neighbourhood :text
-#  address_city          :text
-#  address_state         :text
-#  address_zip_code      :text
-#  phone_number          :text
-#  credits               :decimal(, )     default(0.0)
-#  site_id               :integer         default(1), not null
-#  session_id            :text
-#  locale                :text            default("pt"), not null
-#  sn_token              :text
-#
-
